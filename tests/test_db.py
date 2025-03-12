@@ -1,6 +1,6 @@
 import pytest
 from datetime import date
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, patch, MagicMock, Mock
 from workout_db.db import get_workout, insert_exercise, start_transaction
 
 @pytest.mark.asyncio
@@ -43,8 +43,8 @@ async def test_insert_exercise():
 
 @pytest.mark.asyncio
 async def test_start_transaction():
-    mock_conn = AsyncMock()
-    mock_transaction = AsyncMock()
+    mock_conn = Mock()
+    mock_transaction = Mock()
     mock_transaction.start = AsyncMock()
     mock_conn.transaction.return_value = mock_transaction
 

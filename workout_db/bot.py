@@ -26,7 +26,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE,  ):
     # else:
     #     chat_id = CHAT_ID
 
-    conn, transaction = start_transaction()
+    conn, transaction = await start_transaction()
     
     context.bot_data["db_conn"] = conn
     context.bot_data["db_transaction"] = transaction
