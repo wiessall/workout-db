@@ -1,4 +1,5 @@
 #%%
+import asyncio
 import os
 from telegram import Bot, Update
 from telegram.ext import ContextTypes
@@ -25,7 +26,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE,  ):
     # else:
     #     chat_id = CHAT_ID
 
-    conn, transaction = await start_transaction()
+    conn, transaction = start_transaction()
     
     context.bot_data["db_conn"] = conn
     context.bot_data["db_transaction"] = transaction
@@ -50,6 +51,7 @@ async def listen(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Exercise added! 💪")
     else:
         await update.message.reply_text("Invalid format!")
+
 
 
 async def done(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -83,15 +85,11 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if transaction:
         await transaction.rollback()
+        await conn.close()
     else:
         await update.message.reply_text("No active transaction. Start workout typing /start")
         return
         
-    if conn:
-        await conn.close()
-    else:
-        await update.message.reply_text("No active session. Start workout typing /start")
-
     context.bot_data["workout_buffer"] = []
     context.bot_data["db_conn"] = None
     context.bot_data["db_transaction"] = None

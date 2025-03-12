@@ -1,6 +1,4 @@
 #%%
-# def main():
-#     await send_workout(format_response(await get_workout()))
 import os
 import asyncio
 import nest_asyncio
