@@ -26,7 +26,9 @@ async def main():
     print("Bot is running...")
     app.run_polling()
 
-if __name__ == "__main__":
-
+def run():
     nest_asyncio.apply()
     asyncio.run(main())
+
+if __name__ == "__main__":
+    run()
