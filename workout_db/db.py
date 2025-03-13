@@ -25,13 +25,9 @@ async def get_workout(context: ContextTypes.DEFAULT_TYPE):
     print(f"rows\n {rows}")
     return rows
 
-async def insert_exercise(parsed_exercise: list[set]):
-    conn = await asyncpg.connect(
-        user='workout_user',
-        password='workout',
-        port=5432,
-        host="/run/postgresql",
-        database='workout_db',)
+async def insert_exercise(parsed_exercise: list[set], context: ContextTypes.DEFAULT_TYPE):
+    conn = context.bot_data.get("db_conn")
+
     query = """
     INSERT INTO workouts (machine, exercise, weight, reps, date, workout) VALUES ($1, $2, $3, $4, $5, $6)
     """
@@ -41,12 +37,18 @@ async def insert_exercise(parsed_exercise: list[set]):
 
 
 async def start_transaction():
+    db_host = os.getenv("DB_HOST", "/run/postgresql")
+    db_port = int(os.getenv("DB_PORT", 5432))
+    db_user = os.getenv("DB_USER", "workout_user")
+    db_password = os.getenv("DB_PASSWORD", "workout")
+    db_name = os.getenv("DB_NAME", "workout_db")
+
     conn = await asyncpg.connect(
-        user='workout_user', 
-        password='workout',
-        port=5432, 
-        host="/run/postgresql", 
-        database='workout_db'
+        user=db_user,
+        password=db_password,
+        port=db_port,
+        host=db_host,
+        database=db_name,
     )
     transaction = conn.transaction()
     await transaction.start()

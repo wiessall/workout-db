@@ -37,6 +37,10 @@ async def test_insert_exercise():
     mock_conn = AsyncMock()
     mock_conn.execute = AsyncMock()
 
+    # Mock `context.bot_data["db_conn"]`
+    mock_context = Mock()
+    mock_context.bot_data = {"db_conn": mock_conn}
+
     example_exercise = [("E10", "Squat", "30", 12, 2)]
     example_with_date = ("E10", "Squat", "30", 12, date.today(), 2)
 
@@ -44,10 +48,9 @@ async def test_insert_exercise():
     INSERT INTO workouts (machine, exercise, weight, reps, date, workout) VALUES ($1, $2, $3, $4, $5, $6)
     """
 
-    with patch("workout_db.db.asyncpg.connect", return_value=mock_conn):
-        await insert_exercise(example_exercise)
+    await insert_exercise(example_exercise, mock_context)
 
-        mock_conn.execute.assert_called_once_with(query, *example_with_date)
+    mock_conn.execute.assert_called_once_with(query, *example_with_date)
 
 @pytest.mark.asyncio
 async def test_start_transaction():

@@ -63,7 +63,7 @@ async def done(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     for exercise in workout_buffer:
-        await insert_exercise(exercise)
+        await insert_exercise(exercise, conn)
     
     transaction = context.bot_data.get("db_transaction")
     if transaction:
