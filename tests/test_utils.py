@@ -33,7 +33,8 @@ from workout_db.utils import parse_workout_message
 def test_parser(message, expected):
     mock_context = MagicMock()
     mock_context.bot_data.get.side_effect = lambda key, default: {
-        "current_workout": "machine",
+        "current_workout": 
+"machine|Squat|100|4\nmachine|Bench Press|100|4\nmachine|Leg Press 45|60|12\nmachine|Dips|bw|3\n",
         "workout_number": 999
     }.get(key, default)
     assert parse_workout_message(message, mock_context) == expected, f"Expected: \n {expected} \n Output: \n {parse_workout_message(message, mock_context)}"

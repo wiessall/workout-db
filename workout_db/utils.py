@@ -8,8 +8,11 @@ def parse_workout_message(incoming_message: str, context: ContextTypes.DEFAULT_T
 
     current_workout = context.bot_data.get("current_workout", "No workout available today.")
     workout_number = context.bot_data.get("workout_number", "No workout available today.")
-    current_workout = current_workout.split('|')
-    machine = current_workout[0]
+    current_workout = current_workout.strip().split('\n')
+    current_workout = [line.split('|') for line in current_workout]
+    machine = {
+        exercise: mach for mach, exercise, _, _ in current_workout}
+    print(f"MACH\n {machine}")
     workout = workout_number
 
     parsed_exercise: list[set] = []
@@ -24,7 +27,7 @@ def parse_workout_message(incoming_message: str, context: ContextTypes.DEFAULT_T
             weight = re.search(r'\d+|bw', bit).group()
         elif bit.isdigit():
             reps = int(bit)
-            parsed_exercise.append((machine, exercise.strip().title(), weight, reps, workout))
+            parsed_exercise.append((machine[exercise.strip().title()], exercise.strip().title(), weight, reps, workout))
         i += 1
 
     return parsed_exercise

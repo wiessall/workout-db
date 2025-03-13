@@ -16,9 +16,17 @@ async def test_get_workout():
 
     # fetch() was called with correct SQL?
     query = """
-    SELECT machine, exercise, weight, reps, workout FROM workouts
-    WHERE date = CURRENT_DATE - INTERVAL '7 days'
+    WITH latest_workout AS (
+        SELECT workout, MAX(date) AS latest_date 
+        FROM workouts
+        GROUP BY workout 
+        ORDER BY latest_date ASC 
+        LIMIT 1
+    ) SELECT machine, exercise, weight, reps, workout 
+    FROM workouts
+    WHERE (workout, date) IN (SELECT workout, latest_date FROM latest_workout);
     """
+
     mock_conn.fetch.assert_called_once_with(query)
 
     # return value is correctly passed?

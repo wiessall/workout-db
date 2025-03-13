@@ -11,10 +11,18 @@ async def get_workout(context: ContextTypes.DEFAULT_TYPE):
     conn = context.bot_data.get("db_conn")
 
     query = """
-    SELECT machine, exercise, weight, reps, workout FROM workouts
-    WHERE date = CURRENT_DATE - INTERVAL '7 days'
+    WITH latest_workout AS (
+        SELECT workout, MAX(date) AS latest_date 
+        FROM workouts
+        GROUP BY workout 
+        ORDER BY latest_date ASC 
+        LIMIT 1
+    ) SELECT machine, exercise, weight, reps, workout 
+    FROM workouts
+    WHERE (workout, date) IN (SELECT workout, latest_date FROM latest_workout);
     """
     rows = await conn.fetch(query)
+    print(f"rows\n {rows}")
     return rows
 
 async def insert_exercise(parsed_exercise: list[set]):

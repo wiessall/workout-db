@@ -112,7 +112,9 @@ async def test_listen_sends_warning():
     mock_update = AsyncMock()
     mock_context = AsyncMock()
     mock_context.bot_data = {
-        "current_workout": "Workout 1 | Workout 2",  # ✅ Ensure it's a string, not an AsyncMock
+
+        "current_workout":
+            "machine|Squat|100|4\nmachine|Bench Press|100|4\nmachine|Leg Press 45|60|12\nmachine|Dips|bw|3\n",
         "workout_number": 1,
     }
 
