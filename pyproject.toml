@@ -20,7 +20,7 @@ dependencies = [
     "jupyter-client (>=8.6.3,<9.0.0)",
     "pandas (>=2.2.3,<3.0.0)",
     "sqlalchemy (>=2.0.38,<3.0.0)",
-    "psycopg2 (>=2.9.10,<3.0.0)",
+    "psycopg2-binary (>=2.9.10,<3.0.0)",
     "pytest (>=8.3.5,<9.0.0)",
 ]
 
