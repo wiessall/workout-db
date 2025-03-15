@@ -19,17 +19,13 @@ async def send_workout(message):
     await bot.send_message(text=message, chat_id=CHAT_ID)
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE,  ):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # if update:
     #     chat_id = update.effective_chat.id
     # else:
     #     chat_id = CHAT_ID
-
-    conn, transaction = await start_transaction()
     
-    context.bot_data["db_conn"] = conn
-    context.bot_data["db_transaction"] = transaction
     context.bot_data["workout_buffer"] = []
 
     current_workout = await get_workout(context)
@@ -58,7 +54,7 @@ async def done(update: Update, context: ContextTypes.DEFAULT_TYPE):
     workout_buffer = context.bot_data.get("workout_buffer", [])
     conn = context.bot_data.get("db_conn")
 
-    if not workout_buffer or not conn:
+    if not conn:
         await update.message.reply_text("No active session. Start workout typing /start")
         return
 

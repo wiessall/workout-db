@@ -1,11 +1,13 @@
-#%%
+# %%
+import json
 import os
 import asyncpg
-from datetime import date
+from datetime import datetime
 
 from telegram.ext import ContextTypes
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+
 
 async def get_workout(context: ContextTypes.DEFAULT_TYPE):
     conn = context.bot_data.get("db_conn")
@@ -25,7 +27,10 @@ async def get_workout(context: ContextTypes.DEFAULT_TYPE):
     print(f"rows\n {rows}")
     return rows
 
-async def insert_exercise(parsed_exercise: list[set], context: ContextTypes.DEFAULT_TYPE):
+
+async def insert_exercise(
+    parsed_exercise: list[set], context: ContextTypes.DEFAULT_TYPE
+):
     conn = context.bot_data.get("db_conn")
 
     query = """
@@ -33,10 +38,12 @@ async def insert_exercise(parsed_exercise: list[set], context: ContextTypes.DEFA
     """
 
     for machine, exercise, weight, reps, workout in parsed_exercise:
-        await conn.execute(query, machine, exercise, weight, reps, date.today(), workout)
+        await conn.execute(
+            query, machine, exercise, weight, reps, date.today(), workout
+        )
 
 
-async def start_transaction():
+async def start_transaction(context):
     db_host = os.getenv("DB_HOST", "/run/postgresql")
     db_port = int(os.getenv("DB_PORT", 5432))
     db_user = os.getenv("DB_USER", "workout_user")
@@ -52,4 +59,53 @@ async def start_transaction():
     )
     transaction = conn.transaction()
     await transaction.start()
-    return conn, transaction    
+
+    context.bot_data["db_conn"] = conn
+    context.bot_data["db_transaction"] = transaction
+
+
+async def load_initial_workouts(context, data_source):
+    conn = context.bot_data["db_conn"]
+    if isinstance(data_source, str):
+        try:
+            workouts = json.loads(data_source)
+        except Exception as e:
+            print(f"String needs to be JSON-formatted:\n\n{e}")
+    else:
+        raise ValueError(f"data_source needs to be str but is {type(data_source)}")
+
+    for workout in workouts:
+        try:
+            await conn.execute(
+                """
+               INSERT INTO workouts (Machine, Exercise, Weight, Reps, Date, Workout) 
+               VALUES ($1, $2, $3, $4, $5, $6)
+           """,
+                *(
+                    workout["Machine"],
+                    workout["Exercise"],
+                    workout["Weight"],
+                    int(workout["Reps"]),
+                    datetime.strptime(workout["Date"], '%Y-%m-%d'),
+                    int(workout["Workout"]),
+                ),
+            )
+        except Exception as e:
+            print(f"Skipping invalid row {workout}:\n {e}")
+
+    transaction = context.bot_data.get("db_transaction")
+    if transaction:
+        await transaction.commit()
+
+
+async def table_empty(context) -> bool:
+    conn = context.bot_data["db_conn"]
+    query = """
+        SELECT CASE
+            WHEN EXISTS (SELECT * FROM workouts LIMIT 1)
+            THEN 1
+            ELSE 0
+        END
+    """
+    exists = await conn.fetch(query)
+    return ~bool(exists[0][0])
