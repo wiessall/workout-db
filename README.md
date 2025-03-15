@@ -1,6 +1,25 @@
 # Workout Bot
 Simple telegram chat bot retrieving and inserting workout information from a postgresql database.
 
+I use this project to learn more hands-on on these subjects:
+  - async Mock testing
+    - figuring out how 100% test coverage might look like for a simple project
+  - python SQL interactions
+  - python development on nix(os)
+    - devShell with FHS
+    - direnv for automatic devShell activation
+    - poetry and dream2nix for compatability with non-nix development
+    - nix-containers
+    - nix flake and module packaging
+
 # TODOS
-  - mock set vars
-  - package up
+  - [ ] test if the service executes as and when expected
+  - [ ] some tests missing
+  - [ ] add docstrings and typing
+  - [ ] test deployment outside nixos-container
+  - [ ] passing of env variables is a bit hacky currently 
+    - systemd-creds
+    - systemd LoadCredential
+    - figure out how to pass environment variables to the service without env file
+  - [ ] check if SQL injections possible
+  - [ ] refactor flake
