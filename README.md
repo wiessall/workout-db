@@ -14,7 +14,10 @@ I use this project to learn more hands-on on these subjects:
 
 # TODOS
   - [ ] test if the service executes as and when expected
+  - [ ] /done does not seem to close app
   - [ ] some tests missing
+  - [ ] logging
+  - [ ] set_variable test not mocked
   - [ ] add docstrings and typing
   - [ ] test deployment outside nixos-container
   - [ ] passing of env variables is a bit hacky currently 
